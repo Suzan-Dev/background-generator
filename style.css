@@ -31,6 +31,7 @@ input {
 #gradientInfo {
   background: transparent;
   width: 290px;
+  text-align: center;
 }
 
 #gradientInfo::selection {

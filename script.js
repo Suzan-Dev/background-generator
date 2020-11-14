@@ -7,9 +7,9 @@ const gradientInfoEl = document.getElementById('gradientInfo');
 let gradientType = 'linear-gradient';
 let shapeOrDirection = 'to right';
 
-const changeProperties = (type, shapOrDire) => {
+const changeProperties = (type, shapeorDirection) => {
   gradientType = type;
-  shapeOrDirection = shapOrDire;
+  shapeOrDirection = shapeorDirection;
 };
 
 const copiedAlert = () => {
@@ -24,9 +24,46 @@ const copiedAlert = () => {
   }, 2000);
 };
 
+const addToLS = () => {
+  localStorage.setItem(
+    'gradientLS',
+    JSON.stringify({
+      gradientType,
+      shapeOrDirection,
+      inputColor1: inputColor1.value,
+      inputColor2: inputColor2.value,
+    })
+  );
+};
+
+const getFromLS = () => {
+  const gradientObj = JSON.parse(localStorage.getItem('gradientLS'));
+  if (!!gradientObj) {
+    const {
+      gradientType,
+      shapeOrDirection,
+      inputColor1: color1,
+      inputColor2: color2,
+    } = gradientObj;
+    const gradient = `${gradientType}(${shapeOrDirection},${color1}, ${color2})`;
+    // bg & copy to clipboard
+    bodyEl.style.background = gradient;
+    gradientInfoEl.value = gradient;
+    // gradientType & shapeOrDirection
+    changeProperties(gradientType, shapeOrDirection);
+    // color1 and color2
+    inputColor1.value = color1;
+    inputColor2.value = color2;
+    // rehydrating select
+    selectEl.value = gradientType === 'linear-gradient' ? 1 : 2;
+  }
+};
+
 const setBackgroundGradient = () => {
-  bodyEl.style.background = `${gradientType}(${shapeOrDirection},${inputColor1.value}, ${inputColor2.value})`;
-  gradientInfoEl.value = `${gradientType}(${shapeOrDirection},${inputColor1.value}, ${inputColor2.value})`;
+  const gradient = `${gradientType}(${shapeOrDirection},${inputColor1.value}, ${inputColor2.value})`;
+  bodyEl.style.background = gradient;
+  gradientInfoEl.value = gradient;
+  addToLS();
 };
 
 inputColor1.addEventListener('input', setBackgroundGradient);
@@ -43,8 +80,11 @@ selectEl.addEventListener('change', (e) => {
   }
 });
 
+// copy to clipboard
 gradientInfoEl.addEventListener('click', () => {
   gradientInfoEl.select();
   document.execCommand('copy');
   copiedAlert();
 });
+
+getFromLS();
